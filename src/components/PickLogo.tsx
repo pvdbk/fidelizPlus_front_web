@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { callAxios, baseURL } from '../common/utils';
 import FormInput from './common/FormInput';
 import FormError from './common/FormError';
-import type { ReactNode, ChangeEvent, MouseEvent } from 'react';
+import type { ReactNode, ChangeEvent, FormEvent } from 'react';
 import type { Consumer, Supplier, Trader, Action } from '../common/types';
 import { TraderContext } from '../App';
+import SubmitButton from './common/SubmitButton';
 
 export default class PickLogo extends Component <{ trader: Trader }>{
 	state = {
@@ -15,10 +16,11 @@ export default class PickLogo extends Component <{ trader: Trader }>{
 	};
 
 	traderId = 0;
+
 	checkConnection: Supplier<Promise<boolean>> = async () => false;
 
 	getPreviousURI: Action = () => {
-		callAxios(
+		callAxios<ArrayBuffer>(
 			{
 				method: 'get',
 				url: `/traders/${this.traderId}/logo`,
@@ -80,8 +82,9 @@ export default class PickLogo extends Component <{ trader: Trader }>{
 		}
 	};
 
-	onSubmit: Consumer<MouseEvent<HTMLButtonElement>> = async e => {
+	onSubmit: Consumer<FormEvent<HTMLFormElement>> = async e => {
 		e.preventDefault();
+		this.setState({ handling: true });
 		if(await this.checkConnection()) {
 			await callAxios(
 				{
@@ -93,6 +96,7 @@ export default class PickLogo extends Component <{ trader: Trader }>{
 			this.setState({ previewURL: ''});
 			this.getPreviousURI();
 		}
+		this.setState({ handling: false });
 	};
 
 	getPrevious: Supplier<ReactNode> = () => this.state.previousURI
@@ -107,13 +111,11 @@ export default class PickLogo extends Component <{ trader: Trader }>{
 	getPreview: Supplier<ReactNode> = () => this.state.handling
 		? (<div>Nous traitons votre choix...</div>)
 		: !this.state.previewURL
-			? null 
+			? null
 			: (
 				<div>
 					<img src={this.state.previewURL} alt="Votre nouveau choix a été pris en compte" />
-					<div>
-						<button onClick={this.onSubmit}>Choisir</button>
-					</div>
+					<SubmitButton handling={this.state.handling} content="Choisir"/>
 					<div>
 						<button onClick={(): void => this.setState({ previewURL: '' })}>Annuler</button>
 					</div>
@@ -128,7 +130,7 @@ export default class PickLogo extends Component <{ trader: Trader }>{
 			this.traderId = trader ? trader.id : 0;
 			this.checkConnection = checkConnection;
 			return (
-				<form>
+				<form onSubmit={this.onSubmit}>
 					{this.getPrevious()}
 					<FormInput
 						label={this.state.previousURI ? 'Pour le changer :' : 'Pour remédier à cela :'}

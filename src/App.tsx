@@ -6,6 +6,7 @@ import PickLogo from './components/PickLogo';
 import { callAxios, xor } from './common/utils';
 import type { ReactNode } from 'react';
 import type { Action, Supplier, Func, Trader } from './common/types';
+import MakePay from './components/MakePay';
 
 export const TraderContext = createContext<{
 	trader: Trader;
@@ -26,7 +27,7 @@ export default class App extends Component {
 
 
 	checkConnection: Supplier<Promise<boolean>> = async () => {
-		const { data, status } = await callAxios(
+		const { data, status } = await callAxios<Trader>(
 			{
 				method: 'get',
 				url: '/credentials',
@@ -53,6 +54,7 @@ export default class App extends Component {
 		this.state.trader ? (
 			<div>
 				<PickLogo trader={this.state.trader} />
+				<MakePay />
 				<LogOut onLogOut={this.nullifyTrader} />
 			</div>
 		) : this.state.loading ? (

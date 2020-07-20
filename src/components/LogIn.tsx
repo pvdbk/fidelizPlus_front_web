@@ -21,7 +21,7 @@ export default class LogIn extends Component<{ onLogIn: Consumer<Trader> }> {
 	connection: Consumer<FormEvent<HTMLFormElement>> = e => {
 		e.preventDefault();
 		this.setState({ handling: true });
-		callAxios(
+		callAxios<Trader>(
 			{
 				method: 'post',
 				url: '/logIn',
@@ -53,13 +53,13 @@ export default class LogIn extends Component<{ onLogIn: Consumer<Trader> }> {
 					<FormInput
 						label="Identifiant de connexion :"
 						onChange={this.updateState('connectionId')}
-						required
+						required={true}
 					/>
 					<FormInput
 						label="Mot de passe :"
 						type="password"
 						onChange={this.updateState('password')}
-						required
+						required={true}
 					/>
 					<FormError message={this.state.errMessage} />
 					<SubmitButton handling={this.state.handling} content="Se connecter" />

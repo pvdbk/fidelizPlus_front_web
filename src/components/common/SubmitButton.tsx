@@ -3,7 +3,7 @@ import type { Supplier } from '../../common/types';
 import type { ReactNode } from 'react';
 
 export default class SubmitButton extends Component<{
-	handling: boolean;
+	handling?: boolean;
 	content: string;
 }> {
 	render: Supplier<ReactNode> = () => (
